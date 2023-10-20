@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>BrowserifyTestForm</title>
+		<script src="./Dudezilla.js"></script>
+        <script>
+            // console.log('Does the script load?')
+            // throw new Error('Does the script load?')
+            const dZilla = require('Dudezilla')
+            const ControlBindings = dZilla.ControlBindings
+            const ControlConfiguration = dZilla.ControlConfiguration
+            const Control = dZilla.Control
+
+
+            function init() {
+                window.dudezilla = { bindings: new ControlBindings() }
+                
+                let config = {
+                    'name': 'test',
+                    'label': 'lblTest',
+                    'current': 'STRING_TEST_VALUE',
+                    'control_type': 'test_control'
+                }
+                let controlConf = new ControlConfiguration(config)
+                controlConf.setRootID('root')
+                const control = new Control(controlConf)
+                //document.getElementById('root').appendChild(control.element)
+                //controlBindings.bind(control)
+                //throw new Error('Should see an error here!')
+            }
+
+            window.addEventListener('load', init)
+
+        </script>
+	</head>
+	<body>
+        <div id="root">This fixture is included to test if modules can be loaded.
+            <p>
+                const ControlCollection = require('Dudezilla')
+                const ControlBindings = ControlCollection.ControlBindings
+                const ControlConfiguration = ControlCollection.ControlConfiguration
+                const Control = ControlCollection.Control
+            </p>
+        </div>
+	</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>VerboseBooleanControl</title>
+		<script src="./Dudezilla.js"></script>
+        <script>
+            const dZilla = require('Dudezilla')
+            const ControlBindings = dZilla.ControlBindings
+            const ControlConfiguration = dZilla.ControlConfiguration
+            const VerboseBooleanControl = dZilla.VerboseBooleanControl
+
+            function init() {
+                window.dudezilla = { bindings: new ControlBindings() }
+                config = {
+                    name:"still_stats",
+                    label:"Still Stats",
+                    current:false,
+                    control_type: "boolean"
+                };
+                let controlConf = new ControlConfiguration(config)
+                controlConf.setRootID('root')
+                controlConf.isValid() ? console.log('controlConf is valid!') : console.log('controlConf is NOT valid!')
+                const control = new VerboseBooleanControl(controlConf)
+                window.dudezilla.bindings.append(control)
+                control.buildSubControls()
+                let domElement = control.getElement()
+                document.getElementById('root').appendChild(domElement)
+                control.applyHandlers()
+            }
+            window.addEventListener('load', init)
+        </script>
+	</head>
+	<body>
+        <div id="root">VerboseBooleanControl Fixture - Appended to this text is the truth value of the boolean control:
+        </div>
+	</body>
+</html>

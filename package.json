@@ -1,0 +1,50 @@
+{
+  "name": "dudezilla-controls",
+  "version": "0.0.0",
+  "description": "Introduction:",
+  "main": "src/index.mjs",
+  "type": "commonjs",
+  "allowJS": true,
+  "scripts": {
+    "cycle": "concurrently \"npm run test\" \"npm run doc\"",
+    "doc": "node node_modules/jsdoc/jsdoc -c jsdoc.json",
+    "test": "jest",
+    "dev": "node --trace-uncaught src/index.js",
+    "browserify": "npx browserify -r ./src/Dudezilla.js:Dudezilla > ./public/Dudezilla.js",
+    "localhost": "node ./express/staticServer.js",
+    "lint": "npx eslint src/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dudezilla/dudezilla-controls.git"
+  },
+  "author": "Steven Peterson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dudezilla/dudezilla-controls/issues"
+  },
+  "homepage": "https://github.com/dudezilla/dudezilla-controls#readme",
+  "dependencies": {
+    "@babel/core": "^7.22.11",
+    "@babel/preset-env": "^7.22.10",
+    "@types/jest": "^29.5.4",
+    "babel-cli": "^6.26.0",
+    "babel-jest": "^29.6.4",
+    "browserify": "^17.0.0",
+    "concurrently": "^8.2.1",
+    "cypress": "^13.1.0",
+    "eslint-plugin-jest": "^27.2.3",
+    "express": "^4.18.2",
+    "jest": "^29.6.4",
+    "jsdoc": "^4.0.2",
+    "jsdom": "^22.1.0",
+    "nodemon": "^3.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.48.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-n": "^16.0.2",
+    "eslint-plugin-promise": "^6.1.1"
+  }
+}

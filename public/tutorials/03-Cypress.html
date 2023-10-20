@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Tutorial.</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <script src="./Dudezilla.js"></script>
+    <script>
+        const dZilla = require('Dudezilla')
+        const ControlBindings = dZilla.ControlBindings
+        const ControlConfiguration = dZilla.ControlConfiguration
+        const VerboseBooleanControl = dZilla.VerboseBooleanControl
+
+        function init() {
+            window.dudezilla = { bindings: new ControlBindings() }
+            config = {
+                name: "still_stats",
+                label: "Still Stats",
+                current: false,
+                control_type: "boolean"
+            };
+            let controlConf = new ControlConfiguration(config)
+            controlConf.setRootID('root')
+            controlConf.isValid() ? console.log('controlConf is valid!') : console.log('controlConf is NOT valid!')
+            const control = new VerboseBooleanControl(controlConf)
+            control.buildSubControls()
+            window.dudezilla.bindings.append(control)
+            let domElement = control.getElement()
+            document.getElementById('root').appendChild(domElement)
+            control.applyHandlers()
+        }
+        window.addEventListener('load', init)
+    </script>
+</head>
+
+<body>
+    <h1>Tests - Cypress E2E</h1>
+    <p>Now that we have a control that reacts to user input and displays the output, we can do an automated E2E test.
+    </p>
+    <p>Cypress should be installed as a dependency</p>
+    <p>Run the test with <code>npx cypress open</code></p>
+    <p>Tests should be passing. Make sure that the local development server is running.</p>
+    <p>This page in a development environment has a URL of 'http://localhost:3000/Cypress.html'</p>
+    <h2>./cypress/e2e/TestControl.cy.js</h2>
+    <pre>
+    <code>    it('Cypress - VerboseBooleanControl -loads and truth values are accurate', () => {
+    cy.visit('http://localhost:3000/VerboseBooleanControl.html')
+    })
+    </code>
+</pre>
+    <p>By visiting the site - we know that no exceptions were thrown.</p>
+    <p> Let's do some additional testing.</p>
+    <h2>Truth Values</h2>
+    <p>As a boolean control - VerboseBooleanControl can have a value of true or false; the default is false.</p>
+    <p>More of an aside - we have not tested the default values on any of our Controls! But for now, we are testing
+        VerboseBooleanControl</p>
+    <pre><code>
+    ...
+
+    //    config = {
+        //    name:"still_stats",
+        //    current:false,
+        //    control_type: "boolean"
+        //    };
+
+    ...default is false.
+
+    buildString () {
+        let checked = ''
+        if (this.getValue()) {
+          checked = 'checked'
+        }
+        this.appendHTML('<label>')
+        this.appendHTML(`<input type='checkbox' id='${this.getID()}' `)
+        this.appendHTML(`${checked}>`)
+        this.appendHTML(`${this.getLabel()}</label>`)
+        return this.getHTML()
+    }
+
+    ...I'm skeptical of the code above. From ./src/BooleanControl.js
+</code></pre>
+    <p>...I'm skeptical of the code above. From ./src/BooleanControl.js - nake a todo: VERIFY DEFAULT VALUES.</p>
+    <h2>Compare the control values to the true/false label of the VerboseBooleanControl</h2>
+    <pre><code>
+    cy.visit('http://localhost:3000/VerboseBooleanControl.html')
+
+    //css selector for the input element
+    let selector = 'input#root__still_stats__still_stats'
+
+    //css selector for the label element that displays the truth value
+    let textSelector = 'label#root__still_stats'
+
+    //Set an optional timeout to allow the code to render the control
+    //// Then alias the control and label as selected and text, respectively.
+
+    cy.get(selector, { timeout: 2000 }).as('selected')
+    cy.get(textSelector, { timeout: 2000 }).as('text')
+
+    //We use the default value of false
+    cy.get('@selected').should('not.be.checked')
+    cy.get('@text').should('have.text', 'false')
+
+    //We use onClick eventListeners
+    cy.get('@selected').click()
+
+    //We expect the value to be true
+    cy.get('@selected').should('be.checked')
+    cy.get('@text').should('have.text', 'true')
+
+})
+</code></pre>
+    <p>Is Cypress open? if not:<code>npx cypress open</code> then navigate to E2E tests within Cypress.</p><br><hr>
+    <div id="root">Test the truth value from Cypress, then change the value and test again. The default truth value is
+        false.</div>
+    Previous- <a href="./tutorial-01-ExtendControl.html">Extending Control</a>
+    </body>
+
+</html>

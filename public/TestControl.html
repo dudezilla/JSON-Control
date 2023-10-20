@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>BrowserifyTestForm</title>
+		<script src="./Dudezilla.js"></script>
+        <script>
+            const dZilla = require('Dudezilla')
+            const ControlBindings = dZilla.ControlBindings
+            const ControlConfiguration = dZilla.ControlConfiguration
+            const TestControl = dZilla.TestControl
+
+            function init() {
+                window.dudezilla = { bindings: new ControlBindings() }
+                let config = {
+                    'name': 'test',
+                    'label': 'lblTest',
+                    'current': '3',
+                    'control_type': 'test_control'
+                }
+                let controlConf = new ControlConfiguration(config)
+                controlConf.setRootID('root')
+                controlConf.isValid() ? console.log('controlConf is valid!') : console.log('controlConf is NOT valid!')
+                const control = new TestControl(controlConf)
+                window.dudezilla.bindings.append(control)
+                let domElement = control.getElement()
+                document.getElementById('root').appendChild(domElement)
+                control.applyHandlers()
+            }
+            window.addEventListener('load', init)
+        </script>
+	</head>
+	<body>
+        <div id="root">TestControl Fixture
+            <p>
+                Run some tests!
+            </p>
+        </div>
+	</body>
+</html>

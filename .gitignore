@@ -1,0 +1,12 @@
+node_modules
+node_modules\*
+.vscode
+.vscode\*
+package-lock.json
+docs
+docs\*
+coverage
+coverage\*
+babeltest
+babeltest\*
+``
