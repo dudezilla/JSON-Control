@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: TestControl.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: TestControl.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const ControlCollection = require('./ControlCollection.js')
+const ControlBindings = ControlCollection.Control_Bindings
+const Control = ControlCollection.Control
+const document = global.window.document
+
+class TestControl extends Control {
+  //    #displayed_text
+
+  constructor (controlConfig) {
+    super(controlConfig)
+
+    //        this.#displayed_text = document.createElement("div");
+    //        this.#displayed_text.classList.add("textual_content");
+    this.displayedText = document.createElement('div')
+
+    this.makeSubs()
+    this.element = this.makeElement()
+    this.appendHandler({
+      id: this.getID(),
+      type: 'click',
+      func: testHandler
+    })
+  }
+
+  /**
+   * IT is the responsibility of the parent to append the child "Element objects".
+   * This element does not follow the pattern of recursively pulling and appending the elements.
+   * The following code does nothing.
+   * - A solution have make element call - getElement() on the children and append them to the element.
+   * {@link ControlCollection.Control#makeElement}
+   */
+  makeSubs () {
+    let vals = this.getValue()
+    let controlConfig = null
+    for (let i = 0; i &lt; vals; i++) {
+      const config = {
+        name: `sub${i}`,
+        label: `sub control_${i}:`,
+        current: i,
+        control_type: 'test_control'
+      }
+      controlConfig = new ControlCollection.ControlConfiguration(config)
+      controlConfig.setParent(this)
+
+      this.appendChild(new TestControl(controlConfig))
+    }
+  }
+
+  makeElement () {
+    const el = document.createElement('div')
+    el.innerHTML = this.buildString()
+    el.appendChild(this.getDisplayedText())
+
+    //new code.
+    let children = this.subControls.getKeys()
+    //let child = null
+    for (let i = 0; i &lt; children.length; i++) {
+       el.appendChild(this.subControls.fetch(children[i]).getElement())
+    }
+    return el
+  }
+
+  buildString () {
+    this.appendInnerText(this.toString())
+    this.appendHTML('&lt;label>')
+    this.appendHTML(`&lt;input type='checkbox' id='${this.getID()}' >&lt;/input>`)
+    this.appendHTML(`${this.getLabel()}&lt;/label>`)
+    return this.getHTML()
+  }
+
+  getDisplayedText () {
+    return this.displayedText
+  }
+
+  appendInnerText (textString) {
+    const textEl = this.getDisplayedText()
+    const text = document.createTextNode(textString)
+    const p = document.createElement('p')
+    p.appendChild(text)
+    textEl.appendChild(p)
+  }
+
+  /**
+     * Would this not append the text to the root element under the anchor element?
+     */
+  appendRootText (textString) {
+    const root = this.getRoot()
+    root.appendInnerText(textString)
+  }
+
+  // AND the pass through from child to parrent invloves calling:
+  // Event linkage from the handler.
+
+  onChildEvent (stateChange) {
+    let msg = '.on_child_listen_event() called'
+    if (this === stateChange) {
+      msg += 'This - the parrent el triggered the event'
+    } else {
+      msg += 'A child element triggered the event.'
+    }
+    console.log(msg)
+    // this.append_inner_text(msg);
+  }
+}
+
+// AND the pass through from child to parrent invloves calling:
+// Event linkage from the handler.
+function testHandler () {
+  const control = global.dudezilla.bindings.fetchGlobal(this.id)
+  control.setValue(this.checked)
+  const root = control.getRoot()
+  const conf = control.getConfig()
+  const cKeys = Object.keys(conf)
+  let cRes = control.getID() + ' Config:\n'
+  for (let i = 0; i &lt; cKeys.length; i++) {
+    cRes += `\t${cKeys[i]}:${conf[cKeys[i]]}\n`
+  }
+
+  root.appendRootText(cRes)
+  root.appendRootText("\nCalling event linkage, passing 'control'")
+  // let root = control.getRoot();
+  control.eventLinkage(root)
+}
+module.exports.TestControl = TestControl
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Dudezilla Controls</a></h2><h3>Classes</h3><ul><li><a href="Control.html">Control</a></li><li><a href="ControlBindings.html">ControlBindings</a></li><li><a href="ControlConfig.html">ControlConfig</a></li><li><a href="ValueDisplayControl.html">ValueDisplayControl</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-01-ExtendControl.html">01-ExtendControl</a></li><li><a href="tutorial-02-ExtendComposite.html">02-ExtendComposite</a></li><li><a href="tutorial-03-Cypress.html">03-Cypress</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Oct 20 2023 17:03:15 GMT-0600 (Mountain Daylight Saving Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

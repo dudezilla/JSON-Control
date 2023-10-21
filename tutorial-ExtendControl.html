@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Tutorial: ExtendControl</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Tutorial: ExtendControl</h1>
+
+    <section>
+
+<header>
+    
+
+    <h2>ExtendControl</h2>
+</header>
+
+<article>
+    <!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Tutorial.</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="">
+  <script src="./Dudezilla.js"></script>
+  <script>
+    const dZilla = require('Dudezilla')
+    const ControlBindings = dZilla.ControlBindings
+    const ControlConfiguration = dZilla.ControlConfiguration
+    const BooleanControl = dZilla.BooleanControl
+
+    function init() {
+      window.dudezilla = { bindings: new ControlBindings() }
+      config = {
+        name: "still_stats",
+        label: "Still Stats",
+        current: false,
+        control_type: "boolean"
+      };
+      let controlConf = new ControlConfiguration(config)
+      controlConf.setRootID('root')
+      controlConf.isValid() ? console.log('controlConf is valid!') : console.log('controlConf is NOT valid!')
+      const control = new BooleanControl(controlConf)
+      window.dudezilla.bindings.append(control)
+      let domElement = control.getElement()
+      document.getElementById('root').appendChild(domElement)
+      control.applyHandlers()
+    }
+    window.addEventListener('load', init)
+  </script>
+</head>
+
+<body>
+  <h1>Extending Control</h1>
+  <hr>
+  <p>The base Control is an Abstract Class.
+    Control implements the basic functionality that all controls will need to have but is missing
+    the specific logic of what to draw for any instance of control and any specific event handlers that are required.
+    Remember that any Control is a hierarchy capable of holding other Controls. </p>
+  <p>Here is a high-level overview of Control ControlBindings and Classes implementing Control. </p>
+  <h2>Life-Cycle</h2>
+  <p>
+  <h3>Assume that some other structure exists in which the Control will be placed. This structure is called the
+    Controller.</h3>
+  At the risk of repeating myself, the lifecycle of a Control is as follows: The constructor is called, sub-controls may
+  be instantiated in the Control Hierarchy buy will need to be rendered into DOM elements - before being inserted into
+  the DOM. Sub-Controls need to be built - a call to buildSubControls() on the highest level control will produce
+  individual Elements and recursively insert them into the top-most-control's element object.
+
+  Now a call to the top-most-controls getElement() method will return a DOM element that can be appended to the DOM. The
+  intent is that the DOM element should be able to contain an arbitrary amount of rendered controls. </p>
+  <p> The Controller will then call the applyHandlers() method, which should be used to set up any event handlers. This
+    method should work recursively as well.
+    Handler/Listener functions are attached to specific HTML elements identified using the ID attribute of the tag.
+  </p>
+  <img src="./ControlLifeCycle.jpg" alt="Control Life Cycle">
+  <hr>
+  <h2>A Simple Control</h2>
+  <p>BooleanControl is a great first tutorial. Take a look at the code.</p>
+  <h3>./src/BooleanControl.js</h3>
+  <pre>
+<code>const ControlCollection = require('./ControlCollection.js')
+    const ControlBindings = ControlCollection.ControlBindings
+    const ControlConfiguration = ControlCollection.ControlConfiguration
+    const Control = ControlCollection.Control
+    
+    class BooleanControl extends Control {
+      //    config = {
+      //    name:"still_stats",
+      //    current:false,
+      //    control_type: "boolean"
+      //    };
+      constructor (controlConfiguration) {
+        super(controlConfiguration)
+        this.element = this.makeElement()
+        this.appendHandler({
+          id: this.getID(),
+          type: 'click',
+          func: booleanHandler
+        })
+      }
+    
+      makeElement () {
+        const el = document.createElement('div')
+        el.innerHTML = this.buildString()
+        return el
+      }
+    
+      buildString () {
+        let checked = ''
+        if (this.getValue()) {
+          checked = 'checked'
+        }
+        this.appendHTML('<label>')
+        this.appendHTML('&lt; input type='checkbox' id='${this.getID()}')
+        this.appendHTML(`${checked}>`)
+        this.appendHTML('${this.getLabel()}</label>')
+        return this.getHTML()
+      }
+    }
+    
+    function booleanHandler () {
+      const control = global.dudezilla.bindings.fetchGlobal(this.id)
+      control.setValue(this.checked)
+    }
+    
+    module.exports.BooleanControl = BooleanControl
+   
+    </code>     
+</pre>
+  <br>
+  <p>
+  </p>
+
+  <h3>Constructor</h3>
+  <pre><code>
+        constructor (controlConfiguration) {
+            super(controlConfiguration)
+            this.element = this.makeElement()
+            this.appendHandler({
+            id: this.getID(),
+            type: 'click',
+            func: booleanHandler
+            })
+    </code></pre>
+  There is an object called a control Configuration. - The ControlConfiguration object is documented in the
+  ControlCollection class.
+  And we will construct one when instantiating this 'BooleanControl' class.
+  The Control class implements the vast majority of the logic. The first call is to super(controlConfiguration) which
+  calls the constructor of the Control class. The Control class constructor outlines the lifecycle of the inherited
+  class.
+  Next - makeElement() is called, and the value is assigned to this.element.
+  Note this is bad practice. This version has been refactored to omit the use of many getters and setters, but this is
+  not an acceptable practice.
+  getElement() should be implemented in Control again. - and makeElement() should be called by getElement() when invoked
+  by either the parent class
+  or the Controller. -The logic of getElement() in the base class should throw a new Error('Not Implemented').
+  <p>This is not critical -we can continue using this template because it is simple. The final step from the constructor
+    is to push an object onto the handlers array.
+    The object maps the id of the HTML-control to the type of event, ex:'click', and the function to called when the
+    event is triggered, which is booleanHandler.
+    We can talk about that later.
+  </p>
+  <h3>makeElement() and buildString()</h3>
+  <pre><code>
+        makeElement () {
+            const el = document.createElement('div')
+            el.innerHTML = this.buildString()
+            return el
+          }
+        
+          buildString () {
+            let checked = ''
+            if (this.getValue()) {
+              checked = 'checked'
+            }
+            this.appendHTML('<label>')
+            this.appendHTML('&lt; input type='checkbox' id='${this.getID()}')
+            this.appendHTML(`${checked}>`)
+            this.appendHTML('${this.getLabel()}</label>')
+            return this.getHTML()
+          }
+        }
+    </code></pre>
+  <p>The function makeElement() produces a new HTML 'div' element and then populates the div with the result of
+    buildString().</p>
+  <p>
+    The resulting element is returned to the constructor and assigned to "this.element". Note that the element is not
+    yet attached to the DOM.
+    buildString() populates an Array&lt;string&gt; object set aside for this purpose in Control. The method getHTML()
+    contains the logic to join the array.
+    In this example, we have a checkbox wrapped in a label, and the checkbox has an ID attribute of "this.getID()" or
+    "${parent.getID()}__${name}"
+    In our example - there is no parent, so 'root' is used.
+  </p>
+
+
+
+  <h3>Instantiating the Control</h3>
+  <pre>
+        <code>
+        const dZilla = require('Dudezilla')
+        const ControlBindings = dZilla.ControlBindings
+        const ControlConfiguration = dZilla.ControlConfiguration
+        const BooleanControl = dZilla.BooleanControl
+
+        function init() {
+            window.dudezilla = { bindings: new ControlBindings() }
+            config = {
+                name:"still_stats",
+                label:"Still Stats",
+                current:false,
+                control_type: "boolean"
+            };
+            let controlConf = new ControlConfiguration(config)
+            controlConf.setRootID('root')
+            controlConf.isValid() ? console.log('controlConf is valid!') : console.log('controlConf is NOT valid!')
+            const control = new BooleanControl(controlConf)
+            window.dudezilla.bindings.append(control)
+            let domElement = control.getElement()
+            document.getElementById('root').appendChild(domElement)
+            control.applyHandlers()
+        }
+        window.addEventListener('load', init)
+        </code>
+    </pre>
+  <h3>Instantiating the BooleanControl</h3>
+  <h3>This above may become dated. A BooleanControl has been included in this page so that the reader may inspect the
+    code.</h3>
+  <p>
+    First, we require the ControlCollection module. This module contains the ControlBindings, ControlConfiguration, and
+    Control classes.
+    Next, we call the init() function when the window loads. The init() function creates a global object called
+    'dudezilla' and assigns it a new ControlBindings object.
+    Next, we create a configuration object for the BooleanControl. The configuration object is documented in the
+    ControlCollection class.
+    Next, we create a new ControlConfiguration object and pass in the configuration object.</p>
+  <h3>The ControlConfiguration contains the data required to have the Control work in a recursive structure and append
+    itself to the DOM - The config object is a serialization of the object, including values like the currently set
+    value, the name, label, and type of control.
+    In the cases of Selection controls - an array of possible values may be supplied.
+  </h3>
+  <h3>ControlFactories will conceal this complexity.</h3>
+  <p>
+
+    Still, prior to calling the constructor, we set the rootID of the ControlConfiguration object to 'root'. In the HTML
+    we have a div with id='root', where the Control's rendered HTML will be inserted. </p>
+  <h3>Sub-control objects can use a parent and should set the the rootID of control configuration using the
+    parents.getID() function.</h3>
+  Next, we check to see if the ControlConfiguration object is valid. This test will be done again inside the Control
+  constructor, yet this is a test driver, and it's beneficial to test here first.
+  Next, we instantiate a new BooleanControl object using the ControlConfiguration object.
+  Next, we append the BooleanControl object to the ControlBindings object.
+  </p>
+  <h3>IF the control is a composite Control made of other Controls, you should call makeSubControls() on the Control
+    here. </h3>
+  <p>
+    Next, we get the DOM element from the BooleanControl object and append it to the DOM.
+    Finally, we call the applyHandlers() method of the BooleanControl object.
+    At this point, the BooleanControl object is fully instantiated and ready to be used.</p>
+  <br>
+  <div id="root">Test the functionality of the booleanControl</div>
+  <hr>
+  Next- <a href="./ExtendComposite.html">Extend a control which is composed of other controls.</a>
+</body>
+
+</html>
+</article>
+
+</section>
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Dudezilla Controls</a></h2><h3>Classes</h3><ul><li><a href="Control.html">Control</a></li><li><a href="ControlBindings.html">ControlBindings</a></li><li><a href="ControlConfig.html">ControlConfig</a></li><li><a href="ValueDisplayControl.html">ValueDisplayControl</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-Cypress.html">Cypress</a></li><li><a href="tutorial-ExtendComposite.html">ExtendComposite</a></li><li><a href="tutorial-ExtendControl.html">ExtendControl</a></li></ul><h3>Global</h3><ul><li><a href="global.html#cc">cc</a></li><li><a href="global.html#ccTwo">ccTwo</a></li><li><a href="global.html#writeFile">writeFile</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun Oct 01 2023 16:58:57 GMT-0600 (Mountain Daylight Saving Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
