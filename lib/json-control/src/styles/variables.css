@@ -1,0 +1,51 @@
+/* variables.css — JSON-Control "Mirror Universe" high-contrast theme
+ *
+ * Linked before style.css in every HTML page served by both the Node and
+ * Python servers. All component classes in style.css reference these vars.
+ */
+
+:root {
+  /* ── Core Palette ──────────────────────────────────────────────────────── */
+  --bg-color:     #000000;
+  --panel-bg:     #1a1a1a;
+  --border-color: #333333;
+
+  /* ── High Contrast Typography ──────────────────────────────────────────── */
+  --text-main:       #ffffff;
+  --text-muted:      #888888;
+  --font-size-lg:    1.2rem;
+  --font-weight-bold: 600;
+
+  /* ── Mirror Universe Accent Colors (Bright / Neon) ─────────────────────── */
+  --accent-primary:   #00ff41;   /* Terminal Green  */
+  --accent-secondary: #00e5ff;   /* Electric Blue   */
+  --accent-error:     #ff3e3e;   /* Neon Red        */
+
+  /* ── Log Level Colors ──────────────────────────────────────────────────── */
+  --level-debug:    #00e5ff;
+  --level-message:  #00ff41;
+  --level-warning:  #ffc107;
+  --level-critical: #ff3e3e;
+
+  /* ── Control Layout ────────────────────────────────────────────────────── */
+  --control-height: 48px;
+  --control-gap:    16px;
+  --border-radius:  4px;
+
+  /* ── Pass / Fail ───────────────────────────────────────────────────────── */
+  --pass-bg:     #0a2a0a;
+  --pass-border: #00ff41;
+  --pass-badge:  #2ea043;
+  --fail-bg:     #2a0a0a;
+  --fail-border: #ff3e3e;
+  --fail-badge:  #cf222e;
+}
+
+body {
+  background-color: var(--bg-color);
+  color:            var(--text-main);
+  font-family:      'Inter', 'Segoe UI', monospace;
+  font-size:        var(--font-size-lg);
+  margin:           0;
+  padding:          20px;
+}

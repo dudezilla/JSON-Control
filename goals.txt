@@ -1,0 +1,123 @@
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║              JSON-Control — Design Iteration Review                      ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  What it is                                                              ║
+║                                                                          ║
+║  A vanilla-JS UI framework where the entire application is described in  ║
+║  a JSON config array, processed by ControlFactory. To change the layout  ║
+║  or composition of a page, you edit JSON. The JS source files never      ║
+║  need to change. No bundler. Native ES modules only. Port 3000.          ║
+║                                                                          ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  Goal 1 — index.html is a permanent boilerplate.                         ║
+║                                                                          ║
+║  It accepts one argument: a ?config= query parameter pointing to a JSON  ║
+║  config file. The file is static and generic. If you find yourself       ║
+║  editing index.html to change a page, something has leaked into the      ║
+║  wrong layer.                                                            ║
+║                                                                          ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  Goal 2 — Every layout piece is a registered control_type.               ║
+║                                                                          ║
+║  Sidebars, columns, tracks, pages — none of them are static HTML. Every  ║
+║  structural element must be its own registered control_type,             ║
+║  instantiable from a JSON config entry via ControlFactory. The config    ║
+║  is the only thing that changes between layouts.                         ║
+║                                                                          ║
+║  PageControl                                                             ║
+║    └── LayoutControl          (control_type: "two_column")               ║
+║          ├── LayoutPartAControl   (sidebar)                              ║
+║          │     └── ConfigDownloadControl                                 ║
+║          │     └── ConfigUploadControl                                   ║
+║          └── LayoutPartBControl   (main area)                            ║
+║                └── TrackViewControl                                      ║
+║                └── PageViewControl                                       ║
+║                                                                          ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  Goal 3 — No layout or wiring logic belongs in JS.                       ║
+║                                                                          ║
+║  Hardcoding zone names, imperatively creating child controls in a        ║
+║  constructor, manually wiring events between siblings — all of that      ║
+║  belongs in config, not code. WorkspaceControl.js currently violates     ║
+║  all three goals and should be refactored into a JSON config + thin      ║
+║  registered shell.                                                       ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+  Generated: 2026-04-03 02:14
+
+  WARNING: Could not reach dev server at http://localhost:3000: <urlopen error [Errno 61] Connection refused>
+     Start it with: pnpm --filter @workspace/json-control run dev
+
+
+──────────────────────────────────────────────────────────────────────
+  Registered control types
+──────────────────────────────────────────────────────────────────────
+
+──────────────────────────────────────────────────────────────────────
+  Design spotlight — recently changed controls
+──────────────────────────────────────────────────────────────────────
+
+  viewport: not registered
+
+  track: not registered
+
+  page: not registered
+
+  workspace: not registered
+
+──────────────────────────────────────────────────────────────────────
+  default.json — bootstrap config
+──────────────────────────────────────────────────────────────────────
+[
+  {
+    "name": "workspace",
+    "label": "Workspace Hub",
+    "control_type": "workspace",
+    "state": {},
+    "layout": "sidebar-left"
+  }
+]
+
+──────────────────────────────────────────────────────────────────────
+  Recent commits
+──────────────────────────────────────────────────────────────────────
+  f4a3e8c Update script to include detailed project goals and design rules
+  4dc5cc1 feat: ViewportControl + TrackControl viewport-swap navigation
+  c74550a refactor: strip zone layout from PageControl — flat DOM insertions only
+  4cbb2e3 fix: WorkspaceControl.buildSubControls() delegates to inner PageControl
+  1d55601 add dist/default.json (force-add past gitignore)
+  b5f0dfc Saved progress at the end of the loop
+
+──────────────────────────────────────────────────────────────────────
+  Test suite
+──────────────────────────────────────────────────────────────────────
+  [32m[MESSAGE][0m 2026-04-03T08:14:04.070Z [reporter] run complete — all passed {"runId":"e220b5c7-8453-48b8-b6a5-cea6ec350f47","total":133,"elapsedMs":3423}
+  Tests:       133 passed, 133 total
+
+──────────────────────────────────────────────────────────────────────
+  Open design questions for next iteration
+──────────────────────────────────────────────────────────────────────
+
+  1. TrackViewControl and PageViewControl were not renamed yet — still
+     named 'track_view' / 'page_view'. Should they become
+     'track_collection' / 'page_collection' to match the
+     aspirational default.json structure?
+
+  2. WorkspaceControl.DEFAULT_CHILDREN still has 'zone' fields — they
+     are silently ignored now that zone layout is gone. Remove
+     them?
+
+  3. TrackControl fires onComplete when the user advances past the last
+     page. Should the workspace wire that up to persist the track
+     somewhere?
+
+  4. ViewportControl is not exposed in default.json — it only exists
+     inside TrackControl. Should it be usable standalone in config
+     too?
+
+  5. No tests yet for TrackViewControl, PageViewControl, or
+     WorkspaceControl. Which would give the most value first?
+
+══════════════════════════════════════════════════════════════════════
+

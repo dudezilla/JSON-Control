@@ -1,0 +1,9 @@
+[
+  {
+    "name":         "workspace",
+    "label":        "Workspace Hub",
+    "control_type": "workspace",
+    "state":        {},
+    "layout":       "sidebar-left"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "@workspace/control-testing",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Testing library for JSON-Control — spy controls, lifecycle metrics, and event simulation",
+  "scripts": {
+    "test": "jest --config jest.config.cjs"
+  },
+  "dependencies": {
+    "@workspace/json-control": "workspace:*",
+    "jest-environment-jsdom": "^30.3.0",
+    "jsdom": "^24.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/jsdom": "^21.1.7",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5",
+    "typescript": "~5.9.2"
+  }
+}

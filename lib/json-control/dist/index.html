@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSON-Control</title>
+  <link rel="stylesheet" href="/src/styles/variables.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="root"><p class="loading">Loading…</p></div>
+  <script type="module">
+    import { ControlFactory } from '/src/ControlFactory.js'
+
+    const params     = new URLSearchParams(location.search)
+    const configPath = params.get('config') || './default.json'
+
+    async function boot () {
+      const res = await fetch(configPath)
+      if (!res.ok) throw new Error('Failed to load config: ' + configPath)
+      const configs = await res.json()
+      const root = document.getElementById('root')
+      root.innerHTML = ''
+      new ControlFactory(configs, 'root').build().mount(root)
+    }
+
+    boot().catch(function (err) {
+      document.getElementById('root').innerHTML =
+        '<p style="color:red">Error: ' + err.message + '</p>'
+    })
+  </script>
+</body>
+</html>
